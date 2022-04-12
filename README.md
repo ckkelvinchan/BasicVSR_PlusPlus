@@ -10,6 +10,7 @@ This is the official repository for BasicVSR++. Please feel free to raise issue 
  
 
 ## TODO
+- [ ] Add configs and checkpoints for deblur and denoise
 - [ ] Add Colab demo
 
 
