@@ -25,7 +25,7 @@ This is the official repository for BasicVSR++. Please feel free to raise issue 
 - [Understanding Deformable Alignment in Video Super-Resolution](https://ckkelvinchan.github.io/projects/DCN), AAAI 2021
 
 ## Pre-trained Weights
-You can find the pre-trained weights for deblurring and denoising in this [link](https://www.dropbox.com/sh/gopo637rbutlxde/AACGnXDlvQMjwfCey3m2g34za?dl=0). For super-resolution and compressed video enhancement, please refer to [MMEditing](https://github.com/open-mmlab/mmediting/tree/master/configs/restorers/basicvsr_plusplus).
+You can find the pre-trained weights for **deblurring** and **denoising** in this [link](https://www.dropbox.com/sh/gopo637rbutlxde/AACGnXDlvQMjwfCey3m2g34za?dl=0). For **super-resolution** and **compressed video enhancement**, please refer to [MMEditing](https://github.com/open-mmlab/mmediting/tree/master/configs/restorers/basicvsr_plusplus).
 
 ## Data Preprocessing
 To be added...
