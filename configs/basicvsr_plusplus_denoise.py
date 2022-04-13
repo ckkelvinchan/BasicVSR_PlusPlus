@@ -1,0 +1,178 @@
+exp_name = 'basicvsr_plusplus_denoise'
+
+# model settings
+model = dict(
+    type='BasicVSR',
+    generator=dict(
+        type='BasicVSRPlusPlus',
+        mid_channels=64,
+        num_blocks=15,
+        is_low_res_input=False,
+        spynet_pretrained='https://download.openmmlab.com/mmediting/restorers/'
+        'basicvsr/spynet_20210409-c6c1bd09.pth',
+        cpu_cache_length=100),
+    pixel_loss=dict(type='CharbonnierLoss', loss_weight=1.0, reduction='mean'))
+
+# model training and testing settings
+train_cfg = dict(fix_iter=5000)
+test_cfg = dict(metrics=['PSNR', 'SSIM'], crop_border=0)
+
+# dataset settings
+train_dataset_type = 'SRFolderMultipleGTDataset'
+val_dataset_type = 'SRFolderMultipleGTDataset'
+
+train_pipeline = [
+    dict(
+        type='GenerateSegmentIndices',
+        interval_list=[1],
+        filename_tmpl='{:05d}.jpg'),
+    dict(
+        type='LoadImageFromFileList',
+        io_backend='disk',
+        key='gt',
+        channel_order='rgb'),
+    dict(type='FixedCrop', keys=['gt'], crop_size=(256, 256)),
+    dict(type='RescaleToZeroOne', keys=['gt']),
+    dict(
+        type='Flip', keys=['gt'], flip_ratio=0.5,
+        direction='horizontal'),
+    dict(type='Flip', keys=['gt'], flip_ratio=0.5, direction='vertical'),
+    dict(type='RandomTransposeHW', keys=['gt'], transpose_ratio=0.5),
+    dict(type='CopyValues', src_keys=['gt'], dst_keys=['lq']),
+    dict(
+        type='RandomNoise',
+        params=dict(
+            noise_type=['gaussian'],
+            noise_prob=[1],
+            gaussian_sigma=[0, 50],
+            gaussian_gray_noise_prob=0,
+            ),
+        keys=['lq'],
+    ),
+    dict(type='FramesToTensor', keys=['lq', 'gt']),
+    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path', 'key'])
+]
+
+test_pipeline = [
+    dict(
+        type='GenerateSegmentIndices',
+        interval_list=[1],
+        filename_tmpl='{:05d}.png'),
+    dict(
+        type='LoadImageFromFileList',
+        io_backend='disk',
+        key='gt',
+        channel_order='rgb'),
+    dict(type='RescaleToZeroOne', keys=['gt']),
+    dict(type='CopyValues', src_keys=['gt'], dst_keys=['lq']),
+    dict(
+        type='RandomNoise',
+        params=dict(
+            noise_type=['gaussian'],
+            noise_prob=[1],
+            gaussian_sigma=[50, 50],  # change to your desired noise level
+            gaussian_gray_noise_prob=0,
+            ),
+        keys=['lq'],
+    ),
+    dict(type='FramesToTensor', keys=['lq', 'gt']),
+    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path', 'key'])
+]
+
+demo_pipeline = [
+    dict(
+        type='GenerateSegmentIndices',
+        interval_list=[1],
+        filename_tmpl='{:05d}.jpg'),
+    dict(
+        type='LoadImageFromFileList',
+        io_backend='disk',
+        key='lq',
+        channel_order='rgb'),
+    dict(type='RescaleToZeroOne', keys=['lq']),
+    dict(type='FramesToTensor', keys=['lq']),
+    dict(type='Collect', keys=['lq'], meta_keys=['lq_path', 'key'])
+]
+
+data = dict(
+    workers_per_gpu=6,
+    train_dataloader=dict(
+        samples_per_gpu=1, drop_last=True, persistent_workers=False),  # 8 gpus
+    val_dataloader=dict(samples_per_gpu=1, persistent_workers=False),
+    test_dataloader=dict(
+        samples_per_gpu=1, workers_per_gpu=1, persistent_workers=False),
+
+    # train
+    train=dict(
+        type='RepeatDataset',
+        times=1000,
+        dataset=dict(
+            type=train_dataset_type,
+            lq_folder='data/DAVIS/JPEGImages/480p',
+            gt_folder='data/DAVIS/JPEGImages/480p',
+            num_input_frames=25,
+            pipeline=train_pipeline,
+            scale=1,
+            test_mode=False)),
+    # val
+    val=dict(
+        type=val_dataset_type,
+        lq_folder='data/Set8',
+        gt_folder='data/Set8',
+        pipeline=test_pipeline,
+        scale=1,
+        test_mode=True),
+    # test (DAVIS-test)
+    # test=dict(
+    #     type=val_dataset_type,
+    #     lq_folder='data/DAVIS-test',
+    #     gt_folder='data/DAVIS-test',
+    #     pipeline=test_pipeline,
+    #     scale=1,
+    #     test_mode=True),
+    # test (Set8)
+    test=dict(
+        type=val_dataset_type,
+        lq_folder='data/Set8',
+        gt_folder='data/Set8',
+        pipeline=test_pipeline,
+        scale=1,
+        test_mode=True),
+)
+
+# optimizer
+optimizers = dict(
+    generator=dict(
+        type='Adam',
+        lr=1e-4,
+        betas=(0.9, 0.99),
+        paramwise_cfg=dict(custom_keys={'spynet': dict(lr_mult=0.25)})))
+
+# learning policy
+total_iters = 600000
+lr_config = dict(
+    policy='CosineRestart',
+    by_epoch=False,
+    periods=[600000],
+    restart_weights=[1],
+    min_lr=1e-7)
+
+checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
+# remove gpu_collect=True in non distributed training
+evaluation = dict(interval=5000, save_image=False, gpu_collect=True)
+log_config = dict(
+    interval=100,
+    hooks=[
+        dict(type='TextLoggerHook', by_epoch=False),
+        dict(type='TensorboardLoggerHook'),
+    ])
+visual_config = None
+
+# runtime settings
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+work_dir = f'./experiments/{exp_name}'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+find_unused_parameters = True
