@@ -118,11 +118,10 @@ data = dict(
     # test
     test=dict(
         type=val_dataset_type,
-        lq_folder='data/DVD/quantitative_datasets/LQ',
-        gt_folder='data/DVD/quantitative_datasets/GT',
+        lq_folder='data/test/LQ',
+        gt_folder='data/test/GT',
         pipeline=test_pipeline,
         scale=1,
-        ann_file='data/DVD_test.txt',
         test_mode=True),
 )
 

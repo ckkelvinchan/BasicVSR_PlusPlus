@@ -33,9 +33,7 @@ train_pipeline = [
         channel_order='rgb'),
     dict(type='FixedCrop', keys=['gt'], crop_size=(256, 256)),
     dict(type='RescaleToZeroOne', keys=['gt']),
-    dict(
-        type='Flip', keys=['gt'], flip_ratio=0.5,
-        direction='horizontal'),
+    dict(type='Flip', keys=['gt'], flip_ratio=0.5, direction='horizontal'),
     dict(type='Flip', keys=['gt'], flip_ratio=0.5, direction='vertical'),
     dict(type='RandomTransposeHW', keys=['gt'], transpose_ratio=0.5),
     dict(type='CopyValues', src_keys=['gt'], dst_keys=['lq']),
@@ -46,11 +44,14 @@ train_pipeline = [
             noise_prob=[1],
             gaussian_sigma=[0, 50],
             gaussian_gray_noise_prob=0,
-            ),
+        ),
         keys=['lq'],
     ),
     dict(type='FramesToTensor', keys=['lq', 'gt']),
-    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path', 'key'])
+    dict(
+        type='Collect',
+        keys=['lq', 'gt'],
+        meta_keys=['lq_path', 'gt_path', 'key'])
 ]
 
 test_pipeline = [
@@ -72,11 +73,14 @@ test_pipeline = [
             noise_prob=[1],
             gaussian_sigma=[50, 50],  # change to your desired noise level
             gaussian_gray_noise_prob=0,
-            ),
+        ),
         keys=['lq'],
     ),
     dict(type='FramesToTensor', keys=['lq', 'gt']),
-    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path', 'key'])
+    dict(
+        type='Collect',
+        keys=['lq', 'gt'],
+        meta_keys=['lq_path', 'gt_path', 'key'])
 ]
 
 demo_pipeline = [
@@ -122,19 +126,10 @@ data = dict(
         pipeline=test_pipeline,
         scale=1,
         test_mode=True),
-    # test (DAVIS-test)
-    # test=dict(
-    #     type=val_dataset_type,
-    #     lq_folder='data/DAVIS-test',
-    #     gt_folder='data/DAVIS-test',
-    #     pipeline=test_pipeline,
-    #     scale=1,
-    #     test_mode=True),
-    # test (Set8)
     test=dict(
         type=val_dataset_type,
-        lq_folder='data/Set8',
-        gt_folder='data/Set8',
+        lq_folder='data/test/LQ',
+        gt_folder='data/test/GT',
         pipeline=test_pipeline,
         scale=1,
         test_mode=True),
