@@ -34,6 +34,9 @@ python demo/restoration_video_demo.py configs/basicvsr_plusplus_reds4.py chkpts/
 ```
 You can also replace `${IN_PATH} ${OUT_PATH}` by your video path (e.g., `xxx/yyy.mp4`) to input/output videos.
 
+## Training Models
+1. Put the dataset in the designated locations specified in the configuration file.
+2. `sh tools/dist_train.sh ${CONFIG} ${NGPUS}`
 
 ## Data Preprocessing
 To be added...
