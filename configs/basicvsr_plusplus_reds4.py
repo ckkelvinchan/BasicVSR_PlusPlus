@@ -18,6 +18,7 @@ test_cfg = dict(metrics=['PSNR'], crop_border=0)
 # dataset settings
 train_dataset_type = 'SRREDSMultipleGTDataset'
 val_dataset_type = 'SRREDSMultipleGTDataset'
+test_dataset_type = 'SRFolderMultipleGTDataset'
 
 train_pipeline = [
     dict(type='GenerateSegmentIndices', interval_list=[1]),
@@ -106,13 +107,11 @@ data = dict(
         test_mode=True),
     # test
     test=dict(
-        type=val_dataset_type,
-        lq_folder='data/REDS/train_sharp_bicubic/X4',
-        gt_folder='data/REDS/train_sharp',
-        num_input_frames=100,
+        type=test_dataset_type,
+        lq_folder='data/test/LQ',
+        gt_folder='data/test/GT',
         pipeline=test_pipeline,
-        scale=4,
-        val_partition='REDS4',
+        scale=1,
         test_mode=True),
 )
 

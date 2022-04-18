@@ -60,8 +60,8 @@ data = dict(
     test_dataloader=dict(samples_per_gpu=1, workers_per_gpu=1),
     test=dict(
         type=test_dataset_type,
-        lq_folder='./data/NTIRE21_decompression_track1/LQ',
-        gt_folder='./data/NTIRE21_decompression_track1/GT',
+        lq_folder='data/test/LQ',
+        gt_folder='data/test/GT',
         pipeline=test_pipeline,
         scale=4,
         test_mode=True),

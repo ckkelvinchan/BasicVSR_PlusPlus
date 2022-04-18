@@ -18,7 +18,6 @@ test_cfg = dict(metrics=['PSNR', 'SSIM'], crop_border=0, convert_to='y')
 # dataset settings
 train_dataset_type = 'SRVimeo90KMultipleGTDataset'
 val_dataset_type = 'SRFolderMultipleGTDataset'
-test_dataset_type = 'SRVimeo90KDataset'
 
 train_pipeline = [
     dict(
@@ -123,13 +122,11 @@ data = dict(
         test_mode=True),
     # test
     test=dict(
-        type=test_dataset_type,
-        lq_folder='data/vimeo90k/BDx4',
-        gt_folder='data/vimeo90k/GT',
-        ann_file='/data/vimeo90k/meta_info_Vimeo90K_test_GT.txt',
+        type=val_dataset_type,
+        lq_folder='data/test/LQ',
+        gt_folder='data/test/GT',
         pipeline=test_pipeline,
-        scale=4,
-        num_input_frames=7,
+        scale=1,
         test_mode=True),
 )
 
