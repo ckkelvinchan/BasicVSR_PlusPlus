@@ -7,11 +7,15 @@ This is the official repository for BasicVSR++. Please feel free to raise issue 
 
 **Acknowedgement**: Our work is built upon [MMEditing](https://github.com/open-mmlab/mmediting). Please follow and star this repository and MMEditing!
 
+## News
+- 2 Dec 2021: Colab demo released <a href="https://colab.research.google.com/drive/1I0kZMM0DQyb4ueHZw5si8fMnRCJ_eUX3?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
+- 18 Apr 2022: Code released. Also merged into [MMEditing](https://github.com/open-mmlab/mmediting)
+
 ## TODO
 - [ ] Add data processing scripts
 - [x] ~~Add checkpoints for deblur and denoise~~
 - [x] ~~Add configs for deblur and denoise~~
-- [ ] Add Colab demo
+- [x] ~~Add Colab demo~~
 
 ## Pre-trained Weights
 You can find the pre-trained weights for **deblurring** and **denoising** in this [link](https://www.dropbox.com/sh/gopo637rbutlxde/AACGnXDlvQMjwfCey3m2g34za?dl=0). For **super-resolution** and **compressed video enhancement**, please refer to [MMEditing](https://github.com/open-mmlab/mmediting/tree/master/configs/restorers/basicvsr_plusplus).
@@ -48,3 +52,22 @@ To be added...
 
 **More about deformable alignment:**
 - [Understanding Deformable Alignment in Video Super-Resolution](https://ckkelvinchan.github.io/projects/DCN), AAAI 2021
+
+
+## Citations
+```
+@inproceedings{chan2022basicvsrpp,
+  author = {Chan, Kelvin C.K. and Zhou, Shangchen and Xu, Xiangyu and Loy, Chen Change},
+  title = {{BasicVSR++}: Improving video super-resolution with enhanced propagation and alignment},
+  booktitle = {IEEE Conference on Computer Vision and Pattern Recognition},
+  year = {2022}
+}
+```
+```
+@article{chan2022generalization,
+  title={On the Generalization of {BasicVSR++} to Video Deblurring and Denoising},
+  author={Chan, Kelvin CK and Zhou, Shangchen and Xu, Xiangyu and Loy, Chen Change},
+  journal={arXiv preprint arXiv:2204.05308},
+  year={2022}
+}
+```
