@@ -20,8 +20,12 @@ def parse_args(arg=None):
     parser = argparse.ArgumentParser(description="Restoration demo with optimised memory")
     parser.add_argument("config", help="test config file path")
     parser.add_argument("checkpoint", help="checkpoint file")
-    parser.add_argument("input_dir", help="directory of the input video")
-    parser.add_argument("output_dir", help="directory of the output video")
+    parser.add_argument("input_dir", help="file name of the input video")
+    parser.add_argument(
+        "output_dir",
+        help="directory of the output video "
+        'or use "-" to directly output to stdout (rawvideo in rgb24 pixel format)',
+    )
     parser.add_argument("--filename-tmpl", default="{:08d}.png", help="template of the file names")
     parser.add_argument(
         "--max-seq-len", type=int, default=1, help="maximum sequence length if recurrent framework is used"
