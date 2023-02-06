@@ -10,8 +10,11 @@ This is the official repository for BasicVSR++. Please feel free to raise issue 
 ## News
 - 2 Dec 2021: Colab demo released <a href="https://colab.research.google.com/drive/1I0kZMM0DQyb4ueHZw5si8fMnRCJ_eUX3?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="google colab logo"></a>
 - 18 Apr 2022: Code released. Also merged into [MMEditing](https://github.com/open-mmlab/mmediting)
+- 5 Feb 2023: The checkpoints for **BasicVSR_2x** is released. 
 
 ## TODO
+- [ ] Add BasicVSR_2x architecture
+- [x] ~~Add BasicVSR_2x checkpoints~~
 - [ ] Add data processing scripts
 - [x] ~~Add checkpoints for deblur and denoise~~
 - [x] ~~Add configs for deblur and denoise~~
