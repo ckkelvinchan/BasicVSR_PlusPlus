@@ -75,11 +75,14 @@ def main(arg=None, pipe=None):
     test_pipeline = Compose(test_pipeline)
 
     input_img_size = video_reader.resolution
+    pad = (0, (4 - input_img_size[0] % 4) % 4, 0, (4 - input_img_size[1] % 4) % 4)
     print("input image size:", input_img_size, file=sys.stderr)
+    if any(pad):
+        print("pad:", pad, file=sys.stderr)
 
     frames = []
     frame_num = len(video_reader)
-    for i, frame in tqdm(enumerate(video_reader), unit="frame", total=frame_num, maxinterval=1.0):
+    printed_output_size = False
         if (i + 1) % args.max_seq_len and i + 1 != frame_num:
             frames.append(np.flip(frame, axis=2))
             continue
@@ -88,12 +91,15 @@ def main(arg=None, pipe=None):
         data_chunk = test_pipeline(data)["lq"].unsqueeze(0)
         if len(frames) == 1:
             data_chunk = data_chunk.unsqueeze(0)
+        data_chunk = torch.nn.functional.pad(data_chunk, pad, "constant", 0)
         frames = []
         res = model(lq=data_chunk.to(device), test_mode=True)["output"].cpu()
+        ratio = res.shape[-1] / data_chunk.shape[-1]
         for j in range(res.size(1)):
-            output_frame = tensor2img(res[:, j, :, :, :])
-            if i == 0 and j == 0:
+            output_frame = tensor2img(res[:, j, :, :int(input_img_size[1] * ratio), :int(input_img_size[0] * ratio)])
+            if not printed_output_size:
                 print("output image size:", PIL.Image.fromarray(output_frame).size, file=sys.stderr)
+                printed_output_size = True
             if pipe is not None:
                 pipe.write(PIL.Image.fromarray(np.flip(output_frame, axis=2)).tobytes())
             else:
