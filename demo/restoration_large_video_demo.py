@@ -2,6 +2,7 @@
 import argparse
 import os
 import sys
+import threading
 
 import mmcv
 import numpy as np
@@ -13,6 +14,49 @@ from mmedit.apis import init_model
 from mmedit.core import tensor2img
 from mmedit.utils import modify_args
 from mmedit.datasets.pipelines import Compose
+
+
+class PreRead:
+    def __init__(self, iterator, bufsize=1, num=float("inf")):
+        self._iterator = iterator
+        self._bufsize = bufsize
+        self._cache = []
+        self._num = num
+
+    def __iter__(self):
+        self._readthread = threading.Thread(target=self._read, daemon=True)
+        self._ready_event = threading.Event()
+        self._read_event = threading.Event()
+        self._iterator = iter(self._iterator)
+        self._readthread.start()
+        return self
+    
+    def __next__(self):
+        if len(self._cache) == 0:
+            if self._readthread.is_alive():
+                self._ready_event.clear()
+                self._ready_event.wait()
+            else:
+                raise StopIteration
+        ret = self._cache.pop(0)
+        self._read_event.set()
+        return ret
+    
+    def _read(self):
+        count = 0
+        while True:
+            count += 1
+            if count > self._num:
+                break
+            if len(self._cache) < self._bufsize:
+                try:
+                    self._cache.append(next(self._iterator))
+                    self._ready_event.set()
+                except StopIteration:
+                    break
+            else:
+                self._read_event.wait()
+                self._read_event.clear()
 
 
 def parse_args(arg=None):
@@ -83,6 +127,7 @@ def main(arg=None, pipe=None):
     frames = []
     frame_num = len(video_reader)
     printed_output_size = False
+    for i, frame in tqdm(enumerate(PreRead(video_reader, args.max_seq_len)), unit="frame", total=frame_num, maxinterval=1.0):
         if (i + 1) % args.max_seq_len and i + 1 != frame_num:
             frames.append(np.flip(frame, axis=2))
             continue
@@ -102,6 +147,7 @@ def main(arg=None, pipe=None):
                 printed_output_size = True
             if pipe is not None:
                 pipe.write(PIL.Image.fromarray(np.flip(output_frame, axis=2)).tobytes())
+                pipe.flush()
             else:
                 mmcv.imwrite(output_frame, f"{args.output_dir}/{args.filename_tmpl.format(i+j)}")
 
