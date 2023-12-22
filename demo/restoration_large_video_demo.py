@@ -45,12 +45,12 @@ class PreRead:
     def _read(self):
         count = 0
         while True:
-            count += 1
-            if count > self._num:
+            if count >= self._num:
                 break
             if len(self._cache) < self._bufsize:
                 try:
                     self._cache.append(next(self._iterator))
+                    count += 1
                     self._ready_event.set()
                 except StopIteration:
                     break
